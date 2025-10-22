@@ -1,0 +1,118 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>EHL Careers — Ethical Hacking Lab</title>
+  <meta name="description" content="Front-end employment website for Ethical Hacking lab" />
+  <link rel="stylesheet" href="asset/style.css">
+</head>
+<body>
+  <header>
+    <div class="logo">EHL Careers</div>
+    <nav>
+      <ul>
+        <li><a href="#jobs">Open Positions</a></li>
+        <li><a href="#about">About</a></li>
+        <li><a href="#contact">Apply Now</a></li>
+      </ul>
+    </nav>
+  </header>
+
+  <section class="hero">
+    <h1>Join Our Team at EHL</h1>
+    <p>We’re building the next generation of digital solutions. Explore our job openings and take your career to the next level.</p>
+    <button class="btn" onclick="scrollToJobs()">See Openings</button>
+  </section>
+
+  <main>
+    <section id="jobs">
+      <h2>Open Positions</h2>
+      <div class="jobs">
+        <div class="job">
+          <h3>Frontend Developer</h3>
+          <small>Full-time · Remote</small>
+          <p>We’re looking for a creative developer who loves clean UI, animations, and accessibility.</p>
+        </div>
+        <div class="job">
+          <h3>Backend Developer</h3>
+          <small>Full-time · Hybrid</small>
+          <p>Join our engineering team and work on secure, scalable backend systems.</p>
+        </div>
+        <div class="job">
+          <h3>QA Tester</h3>
+          <small>Internship · On-site</small>
+          <p>Help us improve product quality and automate test processes.</p>
+        </div>
+      </div>
+    </section>
+
+    <section id="about" class="about">
+      <h2>About EHL</h2>
+      <p>EHL is a fast-growing IT company focused on ethical hacking education and software development. We create learning environments that simulate real-world web vulnerabilities, helping students and professionals improve their cybersecurity skills safely.</p>
+    </section>
+
+    <section id="contact">
+    <h2>Apply Now</h2>
+    <form onsubmit="return handleSubmit(event)">
+        <label for="fullname">Full Name</label>
+        <input type="text" id="fullname" name="fullname" required />
+
+        <label for="email">Email</label>
+        <input type="email" id="email" name="email" required />
+
+        <label for="position">Position Interested In</label>
+        <select id="position" name="position" required>
+        <option value="" disabled selected>Select a position</option>
+        <option value="Frontend Developer">Frontend Developer</option>
+        <option value="Backend Developer">Backend Developer</option>
+        <option value="QA Tester">QA Tester</option>
+        <option value="Cybersecurity Analyst">Cybersecurity Analyst</option>
+        <option value="UI/UX Designer">UI/UX Designer</option>
+        </select>
+
+
+        <label for="message">Message</label>
+        <textarea id="message" name="message" rows="4" required placeholder="Tell us why you’re a great fit!"></textarea>
+
+        <button class="btn" type="submit">Submit</button>
+    </form>
+    </section>
+
+  </main>
+
+  <footer>
+    © 2025 EHL Careers — Ethical Hacking Lab | For educational use only
+  </footer>
+
+<script>
+  async function handleSubmit(e) {
+    e.preventDefault();
+
+    const data = {
+      fullname: document.getElementById("fullname").value,
+      email: document.getElementById("email").value,
+      position: document.getElementById("position").value,
+      message: document.getElementById("message").value
+    };
+
+    try {
+      const res = await fetch("/submit", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data)
+      });
+
+      const result = await res.json();
+      alert(result.message);
+      e.target.reset();
+    } catch (err) {
+      alert("Error submitting application. Please try again.");
+      console.error(err);
+    }
+  }
+</script>
+
+
+</body>
+</html>
