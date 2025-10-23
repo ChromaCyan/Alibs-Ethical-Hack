@@ -19,19 +19,17 @@ What this project contains (high level)
 
 - /submit — create an order (table orders)
 
-- /vuln-search — intentionally vulnerable search (SQLi lab)
+- /login — login page that can be brute-force (Hydra)
 
-- /comment and /guestbook — stored XSS lab
+- /admin - vulnerable search (sqli injection)
 
-- /login — simple test user for brute-force exercise
-
-- /upload — file upload test (stores files to uploads/)
+- /guessbook— stored XSS lab
 
 - /phish-landing, /phish-beacon, /phish-stats — phishing demo (harmless)
 
 - /csp-report — Content-Security-Policy reporting endpoint
 
-honeypot decoys (e.g. /admin, /get-data) — logs to honeypot.log
+- honeypot decoys (e.g. /admin, /get-data) — logs to honeypot.log
 ---
 
 ## Important Notice
