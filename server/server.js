@@ -140,15 +140,38 @@ app.use((req, res, next) => {
 });
 
 
-app.post('/csp-report', express.json({ type: ['application/csp-report', 'application/json'] }), (req, res) => {
-  let report = req.body;
-  if (report && report['csp-report']) report = report['csp-report'];
-  const entry = { ts: new Date().toISOString(), ip: req.ip, report };
+app.post('/csp-report', express.text({ type: ['application/csp-report', 'application/json', 'text/plain', '*/*'], limit: '64kb' }), (req, res) => {
+  console.log('CSP report headers:', req.headers['content-type']);
+
+  let payload = req.body;
+  let parsed = null;
+
+  if (typeof payload === 'string' && payload.trim().length > 0) {
+    try {
+      parsed = JSON.parse(payload);
+    } catch (err) {
+      parsed = { raw: payload };
+    }
+  } else {
+    parsed = payload;
+  }
+
+  if (parsed && parsed['csp-report']) parsed = parsed['csp-report'];
+
+  const entry = {
+    ts: new Date().toISOString(),
+    ip: req.ip,
+    headers: { 'user-agent': req.get('User-Agent') },
+    report: parsed
+  };
+
   try {
     fs.appendFileSync(cspLogPath, JSON.stringify(entry) + '\n');
   } catch (e) {
-    console.error('Failed writing CSP report', e);
+    console.error('Failed writing CSP report:', e);
   }
+
+  console.log('Stored CSP report:', parsed);
   res.status(204).end();
 });
 
