@@ -57,10 +57,17 @@ honeypot decoys (e.g. /admin, /get-data) — logs to honeypot.log
 ```bash
 git clone https://github.com/ChromaCyan/Alibs-Ethical-Hack.git
 cd EHL
+
+### 2. Install Dependencies
+
+```bash
+
 npm install
 
-- Create Database by
-"CREATE DATABASE ehl_careers;
+### 3. Create Database in phpmyadmin
+```bash
+
+CREATE DATABASE ehl_careers;
 USE ehl_careers;
 
 -- orders table (demo orders)
@@ -109,5 +116,9 @@ CREATE TABLE lab_users (
 
 -- seed a test user (plain text for lab only)
 INSERT INTO lab_users (username, password) VALUES ('testuser','password123');
-"
-- Run the App (node server/server.js)
+
+
+### 4. Run the App
+```bash
+
+node server/server.js
