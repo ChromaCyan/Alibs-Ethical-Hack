@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Alibaba Shawarma — Special Promotion</title>
+  <link rel="stylesheet" href="/asset/style.css" />
+  <style>
+    .card { max-width: 720px; margin: 2rem auto; background: #fff; border-radius: 10px; box-shadow: 0 6px 24px rgba(0,0,0,0.08); padding: 1.6rem; }
+    h1 { color:#b35f00; margin-bottom:0.3rem; }
+    p.lead { color:#6a4a2a; }
+    .cta { display:flex; gap:12px; margin-top:1rem; }
+    .btn { background:#ffb84d; border:none; padding:10px 14px; border-radius:8px; cursor:pointer; font-weight:700; color:#2b1406; }
+    .note { margin-top:1rem; color:#666; font-size:0.9rem; }
+    li {color:#b35f00; margin-bottom:0.3rem; margin-left:1rem; }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h1>Congratulations — You're Eligible for a Promo!</h1>
+    <p class="lead">Thanks for checking Alibaba Shawarma's demo site. This link is part of a local security training exercise — no real orders will be processed.</p>
+    <p>What happens next:</p>
+    <ul>
+      <li>We recorded your click for training/detection metrics (timestamp + browser info).</li>
+      <li>No personal data or credentials were requested or stored.</li>
+      <li>If you are not part of the test, please close this page or notify the lab supervisor.</li>
+    </ul>
+
+    <div class="cta">
+      <button class="btn" onclick="document.location='/'">Back to Site</button>
+    </div>
+
+    <p class="note"><strong>Lab note:</strong> This landing page is intentionally benign and only logs click metadata for the training exercise.</p>
+  </div>
+</body>
+</html>

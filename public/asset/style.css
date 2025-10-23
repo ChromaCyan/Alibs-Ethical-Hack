@@ -1,173 +1,240 @@
 :root {
-      --bg: #0f1724; --card:#0b1220; --muted:#9aa4b2; --accent:#6ee7b7;
-      --radius: 12px; --gap: 1rem;
-      font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
-    }
-    * { box-sizing: border-box; margin: 0; padding: 0; }
-    body {
-      background: linear-gradient(180deg, #071024 0%, #0b1220 100%);
-      color: #e6eef6;
-      line-height: 1.6;
-    }
-    header {
-      background: rgba(255, 255, 255, 0.05);
-      padding: 1rem 2rem;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-    .logo {
-      font-weight: 700;
-      font-size: 1.4rem;
-      color: var(--accent);
-    }
-    nav ul {
-      display: flex;
-      list-style: none;
-      gap: 1rem;
-    }
-    nav a {
-      color: var(--muted);
-      text-decoration: none;
-      font-weight: 600;
-      padding: 0.4rem 0.7rem;
-      border-radius: 8px;
-    }
-    nav a:hover {
-      background: rgba(255, 255, 255, 0.07);
-      color: var(--accent);
-    }
+  --bg: #2b1a07;    
+  --card: #3a2410;        
+  --muted: #e8d7c0;      
+  --accent: #ffb84d;       
+  --radius: 12px;
+  --gap: 1rem;
+  font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+}
 
-    .hero {
-      padding: 4rem 2rem;
-      text-align: center;
-      background: linear-gradient(160deg, #1a2238, #101826);
-    }
-    .hero h1 {
-      font-size: 2.2rem;
-      margin-bottom: 0.75rem;
-    }
-    .hero p {
-      color: var(--muted);
-      max-width: 650px;
-      margin: 0 auto 1.5rem;
-    }
-    .btn {
-      background: var(--accent);
-      border: none;
-      color: #012018;
-      padding: 0.7rem 1.2rem;
-      border-radius: 10px;
-      font-weight: 700;
-      cursor: pointer;
-    }
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
 
-    main {
-      max-width: 1100px;
-      margin: 0 auto;
-      padding: 2rem;
-      display: grid;
-      gap: 3rem;
-    }
+body {
+  background:
+    linear-gradient(180deg, rgba(43,26,7,0.85) 0%, rgba(58,36,16,0.95) 40%),
+    url("/asset/alibaba.jpg") center/cover no-repeat;
+  color: #fff7ef;
+  line-height: 1.6;
+}
 
-    section h2 {
-      margin-bottom: 1rem;
-      border-left: 4px solid var(--accent);
-      padding-left: 0.75rem;
-    }
+/* Header */
+header {
+  background: rgba(0, 0, 0, 0.25);
+  padding: 1rem 2rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  backdrop-filter: blur(4px);
+}
 
-    /* Job Listings */
-    .jobs {
-      display: grid;
-      gap: 1rem;
-    }
-    .job {
-      background: var(--card);
-      padding: 1rem;
-      border-radius: var(--radius);
-      transition: transform .2s;
-    }
-    .job:hover {
-      transform: translateY(-3px);
-    }
-    .job h3 {
-      color: var(--accent);
-    }
-    .job small {
-      color: var(--muted);
-      display: block;
-      margin-bottom: 0.5rem;
-    }
+.logo {
+  font-weight: 800;
+  font-size: 1.5rem;
+  color: var(--accent);
+  letter-spacing: 0.5px;
+}
 
-    /* About */
-    .about p {
-      color: var(--muted);
-      max-width: 900px;
-    }
+nav ul {
+  display: flex;
+  list-style: none;
+  gap: 1rem;
+}
 
-    /* Contact */
-    form {
-      display: grid;
-      gap: 0.75rem;
-      max-width: 600px;
-    }
-    label {
-      font-size: 0.9rem;
-      color: var(--muted);
-    }
-    input, textarea {
-      background: rgba(255,255,255,0.03);
-      border: 1px solid rgba(255,255,255,0.05);
-      padding: 0.7rem;
-      color: black;
-      border-radius: 8px;
-    }
-    textarea { resize: none; }
+nav a {
+  color: var(--muted);
+  text-decoration: none;
+  font-weight: 600;
+  padding: 0.4rem 0.8rem;
+  border-radius: 8px;
+  transition: 0.2s;
+}
 
-    footer {
-      text-align: center;
-      padding: 2rem;
-      color: var(--muted);
-      font-size: 0.9rem;
-      background: rgba(255,255,255,0.03);
-      margin-top: 2rem;
-    }
+nav a:hover {
+  background: rgba(255, 255, 255, 0.08);
+  color: #fff;
+}
 
-    @media(min-width: 800px) {
-      .hero h1 { font-size: 2.8rem; }
-      .jobs { grid-template-columns: repeat(2, 1fr); }
-    }
+/* Hero */
+.hero {
+  padding: 4rem 2rem;
+  text-align: center;
+  background: linear-gradient(160deg, rgba(0,0,0,0.25), rgba(0,0,0,0.4));
+}
 
-    form input,
-    form textarea,
-    form select {
-    width: 100%;
-    padding: 10px 12px;
-    margin-bottom: 15px;
-    border: 1px solid #ccc;
-    border-radius: 6px;
-    font-size: 16px;
-    font-family: inherit;
-    transition: border-color 0.3s, box-shadow 0.3s;
-    box-sizing: border-box;
-    background-color: #fff;
-    }
+.hero h1 {
+  font-size: 2.4rem;
+  margin-bottom: 0.75rem;
+  color: #fff4e0;
+}
 
-    /* Match focus effect */
-    form input:focus,
-    form textarea:focus,
-    form select:focus {
-    border-color: #007bff;
-    box-shadow: 0 0 5px rgba(0, 123, 255, 0.4);
-    outline: none;
-    }
+.hero p {
+  color: var(--muted);
+  max-width: 700px;
+  margin: 0 auto 1.5rem;
+}
 
-    /* Optional: make dropdown arrow modern-looking */
-    form select {
-    appearance: none;
-    background-image: url('data:image/svg+xml;charset=UTF-8,<svg xmlns="http://www.w3.org/2000/svg" fill="%23007bff" viewBox="0 0 24 24"><path d="M7 10l5 5 5-5z"/></svg>');
-    background-repeat: no-repeat;
-    background-position: right 10px center;
-    background-size: 16px;
-    cursor: pointer;
-    }
+.btn {
+  background: var(--accent);
+  border: none;
+  color: #2b1406;
+  padding: 0.8rem 1.3rem;
+  border-radius: 10px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: transform 0.15s ease;
+}
+.btn:hover {
+  transform: translateY(-2px);
+}
+
+/* Main */
+main {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 2rem;
+  display: grid;
+  gap: 3rem;
+}
+
+main section {
+  background: rgba(0, 0, 0, 0.3);
+  padding: 2rem;
+  border-radius: var(--radius);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+}
+
+section h2 {
+  margin-bottom: 1rem;
+  border-left: 4px solid var(--accent);
+  padding-left: 0.75rem;
+}
+
+/* Menu / Job Cards */
+.jobs {
+  display: grid;
+  gap: 1rem;
+}
+
+.job {
+  background: var(--card);
+  padding: 1rem;
+  border-radius: var(--radius);
+  transition: transform 0.2s;
+}
+.job:hover {
+  transform: translateY(-4px);
+}
+.job h3 {
+  color: var(--accent);
+}
+.job small {
+  color: var(--muted);
+  display: block;
+  margin-bottom: 0.5rem;
+}
+
+/* About */
+.about p {
+  color: var(--muted);
+  max-width: 900px;
+}
+
+/* Forms */
+form {
+  display: grid;
+  gap: 0.75rem;
+  max-width: 600px;
+}
+
+label {
+  font-size: 0.9rem;
+  color: var(--muted);
+}
+
+form input,
+form textarea,
+form select {
+  width: 100%;
+  padding: 10px 12px;
+  margin-bottom: 15px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 6px;
+  font-size: 16px;
+  font-family: inherit;
+  background-color: rgba(255, 255, 255, 0.05);
+  color: #fff7ef;
+  transition: border-color 0.3s, box-shadow 0.3s;
+  box-sizing: border-box;
+}
+
+/* Focus styles */
+form input:focus,
+form textarea:focus,
+form select:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 6px rgba(255, 184, 77, 0.6);
+  outline: none;
+}
+
+/* Modern dropdown arrow */
+form select {
+  appearance: none;
+  background-image: url('data:image/svg+xml;charset=UTF-8,<svg xmlns="http://www.w3.org/2000/svg" fill="%23ffb84d" viewBox="0 0 24 24"><path d="M7 10l5 5 5-5z"/></svg>');
+  background-repeat: no-repeat;
+  background-position: right 10px center;
+  background-size: 16px;
+  cursor: pointer;
+}
+
+textarea {
+  resize: none;
+}
+
+/* Guestbook entries */
+.guestbook-list div {
+  background: rgba(255, 255, 255, 0.05);
+  padding: 0.5rem 1rem;
+  border-radius: 8px;
+  margin-top: 0.5rem;
+}
+
+/* Footer */
+footer {
+  text-align: center;
+  padding: 2rem;
+  color: var(--muted);
+  font-size: 0.9rem;
+  background: rgba(0, 0, 0, 0.25);
+  margin-top: 2rem;
+}
+
+/* Responsive */
+@media (min-width: 800px) {
+  .hero h1 {
+    font-size: 3rem;
+  }
+  .jobs {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+/* Logout button */
+.logout-btn {
+  background: none;
+  border: 1px solid rgba(255,255,255,0.25);
+  padding: 0.4rem 1rem;
+  border-radius: 8px;
+  color: #fff7ef;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+.logout-btn:hover {
+  background: var(--accent);
+  color: #2b1406;
+  border-color: var(--accent);
+}

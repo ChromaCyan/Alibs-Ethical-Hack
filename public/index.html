@@ -1,118 +1,174 @@
 <!doctype html>
 <html lang="en">
+
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>EHL Careers — Ethical Hacking Lab</title>
-  <meta name="description" content="Front-end employment website for Ethical Hacking lab" />
+  <title>Alibaba Shawarma — Home</title>
+  <meta name="description" content="Local shawarma site (lab) — for testing only" />
   <link rel="stylesheet" href="asset/style.css">
 </head>
+
 <body>
   <header>
-    <div class="logo">EHL Careers</div>
+    <div class="logo">Alibaba Shawarma 🥙</div>
     <nav>
       <ul>
-        <li><a href="#jobs">Open Positions</a></li>
+        <li><a href="#menu">Menu</a></li>
         <li><a href="#about">About</a></li>
-        <li><a href="#contact">Apply Now</a></li>
+        <li><a href="#order">Order Now</a></li>
+        <li><a href="guestbook.html">Comments</a></li>
+        <li><a href="/login.html">Admin</a></li>
       </ul>
     </nav>
   </header>
 
+  <!-- HERO -->
   <section class="hero">
-    <h1>Join Our Team at EHL</h1>
-    <p>We’re building the next generation of digital solutions. Explore our job openings and take your career to the next level.</p>
-    <button class="btn" onclick="scrollToJobs()">See Openings</button>
+    <h1>Flavor That Wraps You Back for More</h1>
+    <p>From the sizzling streets of Manila to the food parks of Cebu — Alibaba Shawarma brings you bold, authentic
+      Mediterranean flavors wrapped with love. 🌯</p>
+    <button class="btn" onclick="scrollToMenu()">View Menu</button>
   </section>
 
+  <div class="promo-banner"
+    style="max-width:900px;margin:1.5rem auto;padding:1rem;border-radius:12px;background:linear-gradient(90deg,#fff7ed,#fff4e0);box-shadow:0 6px 18px rgba(0,0,0,0.06);display:flex;align-items:center;gap:1rem">
+    <img src="/asset/banner.jpg" alt="Promo" style="width:84px;height:84px;border-radius:8px;object-fit:cover">
+    <div style="flex:1">
+      <h3 style="margin:0;color:#b35900">Claim your exclusive demo promo</h3>
+      <p style="margin:6px 0;color:#5e3d1f">Limited-time voucher for our loyal customers — click to see how to claim.
+      </p>
+      <a href="/phish-landing?q=test-josh" class="btn"
+        style="display:inline-block;padding:8px 12px;border-radius:8px;background:#ffb84d;color:#2b1406;font-weight:700;text-decoration:none">View
+        Offer</a>
+    </div>
+  </div>
+
   <main>
-    <section id="jobs">
-      <h2>Open Positions</h2>
+    <!-- MENU SECTION -->
+    <section id="menu">
+      <h2>Our Bestsellers</h2>
       <div class="jobs">
         <div class="job">
-          <h3>Frontend Developer</h3>
-          <small>Full-time · Remote</small>
-          <p>We’re looking for a creative developer who loves clean UI, animations, and accessibility.</p>
+          <img src="asset/chicken.jpg" alt="Classic Chicken Shawarma"
+            style="width:100%;border-radius:10px;margin-bottom:0.5rem;">
+          <h3>Classic Chicken Shawarma</h3>
+          <small>₱180 · Hot Favorite</small>
+          <p>Juicy marinated chicken, crisp veggies, and garlic sauce — the perfect handheld meal.</p>
         </div>
         <div class="job">
-          <h3>Backend Developer</h3>
-          <small>Full-time · Hybrid</small>
-          <p>Join our engineering team and work on secure, scalable backend systems.</p>
+          <img src="asset/beef.jpg" alt="Beef Shawarma Deluxe"
+            style="width:100%;border-radius:10px;margin-bottom:0.5rem;">
+          <h3>Beef Shawarma Deluxe</h3>
+          <small>₱220 · Chef’s Pick</small>
+          <p>Slow-roasted beef with caramelized onions, tahini, and our secret spice blend.</p>
         </div>
         <div class="job">
-          <h3>QA Tester</h3>
-          <small>Internship · On-site</small>
-          <p>Help us improve product quality and automate test processes.</p>
+          <img src="asset/falafel.webp" alt="Falafel Wrap" style="width:100%;border-radius:10px;margin-bottom:0.5rem;">
+          <h3>Falafel Wrap (V)</h3>
+          <small>₱150 · Vegan Delight</small>
+          <p>Golden falafel balls wrapped with crisp lettuce and creamy hummus.</p>
         </div>
       </div>
     </section>
 
+    <!-- ABOUT SECTION -->
     <section id="about" class="about">
-      <h2>About EHL</h2>
-      <p>EHL is a fast-growing IT company focused on ethical hacking education and software development. We create learning environments that simulate real-world web vulnerabilities, helping students and professionals improve their cybersecurity skills safely.</p>
+      <h2>About Alibaba Shawarma</h2>
+      <p>
+        Alibaba Shawarma started as a humble food stall in 2012 and has since grown to over <strong>120
+          branches</strong> across the Philippines.
+        Known for our signature garlic sauce and freshly grilled meats, we continue to bring warmth and comfort through
+        every wrap.
+      </p>
+
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:1rem;margin-top:1.5rem;">
+        <img src="asset/2.webp" alt="Alibaba Shawarma Branch 1" style="width:100%;border-radius:10px;">
+      </div>
     </section>
 
-    <section id="contact">
-    <h2>Apply Now</h2>
-    <form onsubmit="return handleSubmit(event)">
+    <!-- CAREERS SECTION -->
+    <section id="careers">
+      <h2>We’re Hiring!</h2>
+      <p>
+        Love shawarma? Love serving smiles? We’re expanding our team!
+        Alibaba Shawarma is hiring for various roles in our nationwide branches — from <b>kitchen staff</b> and
+        <b>cashiers</b> to <b>digital marketing interns</b>.
+      </p>
+      <ul style="margin-top:1rem;line-height:1.8; margin-left:1rem; ">
+        <li>✔ Competitive pay and free meal per shift</li>
+        <li>✔ Training and certifications for food safety</li>
+        <li>✔ Friendly and inclusive team culture</li>
+      </ul>
+      <p style="margin-top:1rem;">Apply today — send your resume to <b>careers@alibabashawarma.ph</b></p>
+    </section>
+
+    <!-- ORDER / FORM SECTION -->
+    <section id="order">
+      <h2>Make an Order</h2>
+      <form onsubmit="return handleSubmit(event)">
         <label for="fullname">Full Name</label>
         <input type="text" id="fullname" name="fullname" required />
 
         <label for="email">Email</label>
         <input type="email" id="email" name="email" required />
 
-        <label for="position">Position Interested In</label>
-        <select id="position" name="position" required>
-        <option value="" disabled selected>Select a position</option>
-        <option value="Frontend Developer">Frontend Developer</option>
-        <option value="Backend Developer">Backend Developer</option>
-        <option value="QA Tester">QA Tester</option>
-        <option value="Cybersecurity Analyst">Cybersecurity Analyst</option>
-        <option value="UI/UX Designer">UI/UX Designer</option>
+        <label for="position">Item</label>
+        <select id="item" name="item" required>
+          <option value="" disabled selected>Select an item</option>
+          <option value="Classic Chicken Shawarma">Classic Chicken Shawarma</option>
+          <option value="Beef Shawarma Deluxe">Beef Shawarma Deluxe</option>
+          <option value="Falafel Wrap">Falafel Wrap (V)</option>
         </select>
 
+        <label for="message">Special Notes</label>
+        <textarea id="message" name="message" rows="4" required placeholder="Extra sauce? Allergies?"></textarea>
 
-        <label for="message">Message</label>
-        <textarea id="message" name="message" rows="4" required placeholder="Tell us why you’re a great fit!"></textarea>
-
-        <button class="btn" type="submit">Submit</button>
-    </form>
+        <button class="btn" type="submit">Place Order</button>
+      </form>
     </section>
-
   </main>
 
   <footer>
-    © 2025 EHL Careers — Ethical Hacking Lab | For educational use only
+    © 2025 Alibaba Shawarma
   </footer>
 
-<script>
-  async function handleSubmit(e) {
-    e.preventDefault();
-
-    const data = {
-      fullname: document.getElementById("fullname").value,
-      email: document.getElementById("email").value,
-      position: document.getElementById("position").value,
-      message: document.getElementById("message").value
-    };
-
-    try {
-      const res = await fetch("/submit", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(data)
-      });
-
-      const result = await res.json();
-      alert(result.message);
-      e.target.reset();
-    } catch (err) {
-      alert("Error submitting application. Please try again.");
-      console.error(err);
+  <script>
+    function scrollToMenu() {
+      document.getElementById("menu").scrollIntoView({ behavior: "smooth" });
     }
-  }
-</script>
 
+    async function handleSubmit(e) {
+      e.preventDefault();
+      const data = {
+        fullname: document.getElementById("fullname").value,
+        email: document.getElementById("email").value,
+        item: document.getElementById("item").value,
+        message: document.getElementById("message").value
+      };
 
+      try {
+        // reuse your same /submit endpoint for demo orders
+        const res = await fetch("/submit", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(data)
+        });
+        const result = await res.json();
+        alert(result.message);
+        e.target.reset();
+      } catch (err) {
+        alert("Error submitting demo order. Try again.");
+        console.error(err);
+      }
+    }
+
+    // Small helper: change logo text on other pages too (run on load)
+    document.addEventListener('DOMContentLoaded', () => {
+      const logos = document.querySelectorAll('.logo');
+      logos.forEach(el => { if (!el.textContent.includes('Alibaba')) el.textContent = 'Alibaba Shawarma'; });
+    });
+  </script>
 </body>
+
 </html>

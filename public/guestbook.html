@@ -1,0 +1,177 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Guestbook — EHL Careers (XSS Test)</title>
+  <link rel="stylesheet" href="asset/style.css" />
+  <style>
+    main {
+      max-width: 700px;
+      margin: 3rem auto;
+      background: rgba(255,255,255,0.05);
+      padding: 2rem;
+      border-radius: 12px;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+    }
+
+    h2 {
+      text-align: center;
+      color: var(--accent);
+      margin-bottom: 1.5rem;
+    }
+
+    form {
+      display: grid;
+      gap: 0.8rem;
+      margin-bottom: 2rem;
+    }
+
+    input, textarea {
+      background: rgba(255,255,255,0.08);
+      border: 1px solid rgba(255,255,255,0.2);
+      padding: 0.8rem;
+      color: #fff;
+      border-radius: 8px;
+    }
+
+    button {
+      background: var(--accent);
+      border: none;
+      color: #012018;
+      padding: 0.8rem;
+      font-weight: 700;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    button:hover {
+      background: #7fffc3;
+    }
+
+    .comment {
+      display: flex;
+      gap: 1rem;
+      background: rgba(255,255,255,0.03);
+      border: 1px solid rgba(255,255,255,0.05);
+      border-radius: 10px;
+      padding: 1rem;
+      margin-bottom: 1rem;
+      align-items: flex-start;
+    }
+
+    .avatar {
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      background: var(--accent);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #000;
+      font-weight: bold;
+      font-size: 1.2rem;
+      text-transform: uppercase;
+    }
+
+    .comment-content {
+      flex: 1;
+    }
+
+    .comment-author {
+      font-weight: 600;
+      color: var(--accent);
+      margin-bottom: 0.3rem;
+    }
+
+    .comment-text {
+      color: #fff;
+      word-break: break-word;
+    }
+
+    footer {
+      text-align: center;
+      margin-top: 2rem;
+      color: var(--muted);
+    }
+  </style>
+</head>
+
+<body>
+  <header>
+    <div class="logo">Alibaba Shawarma 🥙</div>
+    <nav>
+      <ul>
+        <li><a href="index.html">Home</a></li>
+        <li><a href="guestbook.html">Comment</a></li>
+        <li><a href="/login.html">Admin</a></li>
+      </ul>
+    </nav>
+  </header>
+
+  <main>
+    <h2>Comment Section</h2>
+
+    <form id="commentForm">
+      <input name="name" placeholder="Your name (optional)" />
+      <textarea name="comment" placeholder="Leave a comment..." required></textarea>
+      <button type="submit">Post</button>
+    </form>
+
+    <div id="list"></div>
+  </main>
+
+  <footer>
+        © 2025 Alibaba Shawarma
+    </footer>
+
+  <script>
+    const form = document.getElementById('commentForm');
+    const list = document.getElementById('list');
+
+    form.onsubmit = async e => {
+      e.preventDefault();
+      const data = Object.fromEntries(new FormData(form));
+      await fetch('/comment', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data)
+      });
+      form.reset();
+      loadComments();
+    };
+
+    async function loadComments() {
+      const res = await fetch('/guestbook');
+      const text = await res.text();
+
+      const parser = new DOMParser();
+      const doc = parser.parseFromString(text, 'text/html');
+      const rawDivs = doc.querySelectorAll('div');
+
+      list.innerHTML = '';
+
+      rawDivs.forEach(div => {
+        const strong = div.querySelector('strong');
+        if (!strong) return;
+
+        const name = strong.textContent.trim() || 'Anonymous';
+        const comment = div.innerHTML.replace(/<strong>.*<\/strong>:/, '').trim();
+
+        const el = document.createElement('div');
+        el.className = 'comment';
+        el.innerHTML = `
+          <div class="avatar">${name[0] || 'A'}</div>
+          <div class="comment-content">
+            <div class="comment-author">${name}</div>
+            <div class="comment-text">${comment}</div>
+          </div>
+        `;
+        list.appendChild(el);
+      });
+    }
+
+    loadComments();
+  </script>
+</body>
+</html>

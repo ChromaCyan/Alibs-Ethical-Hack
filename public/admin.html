@@ -1,0 +1,185 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Alibaba Shawarma — Admin</title>
+    <link rel="stylesheet" href="asset/style.css" />
+    <style>
+        .dashboard {
+            max-width: 1100px;
+            margin: 3rem auto;
+            background: var(--card);
+            padding: 2rem;
+            border-radius: var(--radius);
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+        }
+
+        .dashboard h2 {
+            color: var(--accent);
+            margin-bottom: 1.5rem;
+        }
+
+        .search-bar {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .search-bar input {
+            flex: 1;
+            padding: 0.8rem;
+            border-radius: 8px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            background: rgba(255, 255, 255, 0.05);
+            color: #e6eef6;
+        }
+
+        .search-bar button {
+            background: var(--accent);
+            border: none;
+            padding: 0.8rem 1.2rem;
+            border-radius: 8px;
+            font-weight: 700;
+            color: #012018;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .search-bar button:hover {
+            background: #57da9f;
+        }
+
+        .table-wrapper {
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 1rem;
+            background: rgba(255, 255, 255, 0.02);
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        th,
+        td {
+            padding: 0.9rem 1rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+            text-align: left;
+        }
+
+        th {
+            color: var(--accent);
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        td {
+            color: #e6eef6;
+        }
+
+        tr:hover {
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .empty-state {
+            text-align: center;
+            color: var(--muted);
+            margin-top: 2rem;
+        }
+    </style>
+</head>
+
+<body>
+    <header>
+        <div class="logo">Alibaba Shawarma 🥙</div>
+        <nav>
+            <ul>
+                <li><a href="index.html">Home</a></li>
+                <li><a href="guestbook.html">Comments</a></li>
+                <li><button id="logoutBtn" class="logout-btn">Logout</button></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main class="dashboard">
+        <h2>Order Records</h2>
+
+        <div class="search-bar">
+            <input id="query" placeholder="Search order by name or email..." />
+            <button id="searchBtn">Search</button>
+        </div>
+
+        <div id="results" class="table-wrapper">
+            <div class="empty-state">Enter a search query to view orders</div>
+        </div>
+    </main>
+
+    <footer>
+        © 2025 Alibaba Shawarma
+    </footer>
+
+    <script>
+        if (localStorage.getItem("isLoggedIn") !== "true") {
+            window.location.href = "login.html";
+        }
+
+        const logoutBtn = document.getElementById('logoutBtn');
+        if (logoutBtn) {
+            logoutBtn.addEventListener('click', () => {
+                localStorage.removeItem("isLoggedIn");
+                localStorage.removeItem("username");
+                alert("You have been logged out.");
+                window.location.href = "login.html";
+            });
+        }
+
+        const user = localStorage.getItem("username");
+        if (user) {
+            const logo = document.querySelector(".logo");
+            logo.innerHTML += ` <span style="opacity:0.7;font-size:0.9em;">(${user})</span>`;
+        }
+
+        async function loadApplicants(q = '') {
+            const res = await fetch('/vuln-search?q=' + encodeURIComponent(q));
+            const data = await res.json().catch(() => []);
+
+            if (!data.length) {
+                document.getElementById('results').innerHTML =
+                    `<div class='empty-state'>No applicants found for "<b>${q}</b>"</div>`;
+                return;
+            }
+
+            let table = `
+      <table>
+        <thead>
+          <tr><th>ID</th><th>Full Name</th><th>Email</th><th>Item</th><th>Message</th</tr>
+        </thead>
+        <tbody>
+    `;
+
+            for (const row of data) {
+                table += `
+        <tr>
+          <td>${row.id}</td>
+          <td>${row.fullname}</td>
+          <td>${row.email}</td>
+          <td>${row.item}</td>
+          <td>${row.message}</td>
+        </tr>`;
+            }
+
+            table += "</tbody></table>";
+            document.getElementById('results').innerHTML = table;
+        }
+
+        document.getElementById('searchBtn').onclick = () => {
+            const q = document.getElementById('query').value;
+            loadApplicants(q);
+        };
+    </script>
+</body>
+
+</html>
