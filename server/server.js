@@ -4,8 +4,8 @@ const cors = require("cors");
 const path = require("path");
 const fs = require("fs");
 const multer = require("multer");
-const rateLimit = require("express-rate-limit"); 
-const bcrypt = require("bcryptjs"); 
+const rateLimit = require("express-rate-limit");
+const bcrypt = require("bcryptjs");
 
 const app = express();
 app.use(cors());
@@ -14,7 +14,7 @@ app.use(express.urlencoded({ extended: true }));
 
 app.use(express.static(path.join(__dirname, "../public")));
 
-const cspLogPath = path.join(__dirname, '..', 'csp-reports.log');
+const cspLogPath = path.join(__dirname, "..", "csp-reports.log");
 
 // --- MySQL connection ---
 const db = mysql.createConnection({
@@ -31,6 +31,17 @@ db.connect((err) => {
   }
 });
 
+const attackLogPath = path.join(__dirname, "..", "attack.log");
+
+function logAttack(entry) {
+  const e = Object.assign({ ts: new Date().toISOString() }, entry);
+  try {
+    fs.appendFileSync(attackLogPath, JSON.stringify(e) + "\n");
+  } catch (err) {
+    console.error("Could not write to attack log:", err);
+  }
+}
+
 // --- Serve index.html ---
 app.get("/", (req, res) => {
   res.sendFile(path.join(__dirname, "../public/index.html"));
@@ -39,14 +50,15 @@ app.get("/", (req, res) => {
 // ==========================================================
 // --- Handle form submission (VULNERABLE) ---
 app.post("/submit", (req, res) => {
-  const { fullname, email, item, message } = req.body; 
+  const { fullname, email, item, message } = req.body;
 
   if (!fullname || !email || !item || !message) {
     return res.status(400).json({ message: "All fields are required" });
   }
 
   // Vulnerable to SQL Injection if later changed to string concatenation
-  const sql = "INSERT INTO orders (fullname, email, item, message) VALUES (?, ?, ?, ?)";
+  const sql =
+    "INSERT INTO orders (fullname, email, item, message) VALUES (?, ?, ?, ?)";
   db.query(sql, [fullname, email, item, message], (err, result) => {
     if (err) {
       console.error("❌ Error inserting data:", err);
@@ -80,23 +92,98 @@ app.post("/submit", (req, res) => {
 */
 
 // ==========================================================
-// --- Stored XSS Guestbook (VULNERABLE) ---
+// --- Stored XSS Guestbook (VULNERABLE) with attack logging ---
 app.post("/comment", (req, res) => {
-  let { name, comment } = req.body;
+  let { name = "", comment = "" } = req.body || {};
 
-  // Make sure quotes don’t break the SQL, but still vulnerable
-  name = name.replace(/'/g, "''");
-  comment = comment.replace(/'/g, "''");
+  // defensive: ensure strings to avoid crash, but keep intentionally vulnerable processing
+  name = String(name);
+  comment = String(comment);
 
-  const sql = `INSERT INTO comments (name, comment) VALUES ('${name}', '${comment}')`;
+  // Prevent SQL string syntax errors by doubling single quotes (still vulnerable to injection)
+  const nameEsc = name.replace(/'/g, "''");
+  const commentEsc = comment.replace(/'/g, "''");
+
+  const sql = `INSERT INTO comments (name, comment) VALUES ('${nameEsc}', '${commentEsc}')`;
 
   console.log("💉 Executing vulnerable SQL:", sql);
+
+  // Log the incoming comment attempt (always)
+  logAttack({
+    type: "comment_submit",
+    ip: req.ip,
+    ua: req.get("User-Agent"),
+    name: name,
+    preview: comment.slice(0, 200),
+    url: req.originalUrl,
+  });
+
+  // Detect suspicious patterns (basic heuristics for demo)
+  const lower = (name + " " + comment).toLowerCase();
+  const xssIndicators = [
+    "<script",
+    "onerror",
+    "onload",
+    "document.cookie",
+    "innerhtml",
+    "<svg",
+    "<iframe",
+    "javascript:",
+  ];
+  const sqliIndicators = [
+    "' or '1'='1",
+    "or 1=1",
+    "union select",
+    "information_schema",
+    "drop table",
+    "-- ",
+  ];
+
+  if (xssIndicators.some((p) => lower.includes(p))) {
+    logAttack({
+      type: "stored_xss_detected",
+      note: "Comment contains likely XSS payload",
+      ip: req.ip,
+      ua: req.get("User-Agent"),
+      name: name,
+      preview: comment.slice(0, 500),
+      url: req.originalUrl,
+    });
+  }
+  if (sqliIndicators.some((p) => lower.includes(p))) {
+    logAttack({
+      type: "possible_sql_injection_in_comment",
+      ip: req.ip,
+      ua: req.get("User-Agent"),
+      name: name,
+      preview: comment.slice(0, 500),
+      url: req.originalUrl,
+    });
+  }
 
   db.query(sql, (err, result) => {
     if (err) {
       console.error("❌ SQL Error:", err);
+      logAttack({
+        type: "sql_error",
+        note: err && err.sqlMessage ? err.sqlMessage : String(err),
+        ip: req.ip,
+        ua: req.get("User-Agent"),
+        url: req.originalUrl,
+      });
       return res.status(500).send("Error saving comment");
     }
+
+    // success
+    logAttack({
+      type: "comment_saved",
+      ip: req.ip,
+      ua: req.get("User-Agent"),
+      id: result.insertId || null,
+      name,
+      url: req.originalUrl,
+    });
+
     res.json({ ok: true });
   });
 });
@@ -147,22 +234,79 @@ app.get("/guestbook", (req, res) => {
 // ==========================================================
 // --- Brute Force Login (VULNERABLE) ---
 const testUser = { username: "testuser", password: "password123" };
-
 app.post("/login", (req, res) => {
-  const { username, password } = req.body;
+  const { username = '', password = '' } = req.body || {};
 
-  if (username === testUser.username && password === testUser.password) {
-    return res.json({
-      success: true,
-      message: `✅ Welcome, ${username}!`
+  // Basic input type normalization
+  const userInput = String(username);
+  const passInput = String(password);
+
+  // Log the attempt
+  logAttack({
+    type: 'login_attempt',
+    ip: req.ip,
+    ua: req.get('User-Agent'),
+    username: userInput,
+    url: req.originalUrl
+  });
+
+  const injPatterns = ["'", '"', " or ", " OR ", "1=1", "union", "--", ";"];
+  if (injPatterns.some(p => userInput.toLowerCase().includes(p) || passInput.toLowerCase().includes(p))) {
+    logAttack({
+      type: 'possible_login_injection',
+      note: 'Suspicious characters in username/password',
+      ip: req.ip,
+      ua: req.get('User-Agent'),
+      username: userInput,
+      url: req.originalUrl
     });
   }
-  
-  return res.status(401).send(`
-    <h1>❌ Invalid credentials</h1>
-    <p>Login failed for: <strong>${username}</strong></p>
-    <p><a href="/login.html">Try again</a></p>
-  `);
+
+  const sql = "SELECT username, password, is_hashed FROM admin WHERE username = ?";
+  db.query(sql, [userInput], (err, results) => {
+    if (err) {
+      console.error('DB error during login:', err);
+      logAttack({ type: 'login_db_error', error: err.message, ip: req.ip, username: userInput });
+      return res.status(500).json({ message: 'Database error' });
+    }
+
+    if (!results || results.length === 0) {
+      logAttack({ type: 'login_failed', reason: 'no_such_user', ip: req.ip, username: userInput });
+      return res.status(401).send(`
+        <h1>❌ Invalid credentials</h1>
+        <p>Login failed for: <strong>${userInput}</strong></p>
+        <p><a href="/login.html">Try again</a></p>
+      `);
+    }
+
+    const user = results[0];
+
+    if (user.is_hashed) {
+      if (bcrypt.compareSync(passInput, user.password)) {
+        logAttack({ type: 'login_success', username: user.username, method: 'bcrypt', ip: req.ip, ua: req.get('User-Agent') });
+        return res.json({ success: true, message: `✅ Welcome, ${user.username}!` });
+      } else {
+        logAttack({ type: 'login_failed', reason: 'bad_password', username: user.username, ip: req.ip });
+        return res.status(401).send(`
+          <h1>❌ Invalid credentials</h1>
+          <p>Login failed for: <strong>${userInput}</strong></p>
+          <p><a href="/login.html">Try again</a></p>
+        `);
+      }
+    } else {
+      if (passInput === user.password) {
+        logAttack({ type: 'login_success', username: user.username, method: 'plaintext', ip: req.ip, ua: req.get('User-Agent') });
+        return res.json({ success: true, message: `✅ Welcome, ${user.username}!` });
+      } else {
+        logAttack({ type: 'login_failed', reason: 'bad_password', username: user.username, ip: req.ip });
+        return res.status(401).send(`
+          <h1>❌ Invalid credentials</h1>
+          <p>Login failed for: <strong>${userInput}</strong></p>
+          <p><a href="/login.html">Try again</a></p>
+        `);
+      }
+    }
+  });
 });
 /*
  // --- Brute Force Login (SANITIZED EXAMPLE) ---
@@ -182,12 +326,18 @@ app.post("/login", (req, res) => {
 
 // ==========================================================
 // --- Honeypot endpoint (Detection feature, safe) ---
-const decoys = ['/admin', '/backup.zip', '/.env', '/wp-login.php'];
-app.use((req,res,next)=>{
+const decoys = ["/admin", "/backup.zip", "/.env", "/wp-login.php"];
+app.use((req, res, next) => {
   if (decoys.includes(req.path)) {
-    const log = { ts: new Date().toISOString(), ip: req.ip, ua: req.get('User-Agent'), url: req.originalUrl, headers: req.headers };
-    fs.appendFileSync('honeypot.log', JSON.stringify(log) + '\n');
-    return res.status(404).send('Not Found');
+    const log = {
+      ts: new Date().toISOString(),
+      ip: req.ip,
+      ua: req.get("User-Agent"),
+      url: req.originalUrl,
+      headers: req.headers,
+    };
+    fs.appendFileSync("honeypot.log", JSON.stringify(log) + "\n");
+    return res.status(404).send("Not Found");
   }
   next();
 });
@@ -200,19 +350,27 @@ app.get("/vuln-search", (req, res) => {
 
   console.log("💉 Executing vulnerable query:", sql);
 
-  const attackLogPath = path.join(__dirname, '..', 'attack.log');
+  const attackLogPath = path.join(__dirname, "..", "attack.log");
   const lowerQ = q.toLowerCase();
-  const sqliPatterns = ["' or '1'='1", "or 1=1", "union select", "information_schema", "drop table"];
-  if (sqliPatterns.some(p => lowerQ.includes(p))) {
+  const sqliPatterns = [
+    "' or '1'='1",
+    "or 1=1",
+    "union select",
+    "information_schema",
+    "drop table",
+  ];
+  if (sqliPatterns.some((p) => lowerQ.includes(p))) {
     const entry = {
       ts: new Date().toISOString(),
       ip: req.ip,
       ua: req.get("User-Agent"),
       query: q,
       url: req.originalUrl,
-      note: "Possible SQL Injection Attempt"
+      note: "Possible SQL Injection Attempt",
+      type: "sql_injection_detected",
     };
     fs.appendFileSync(attackLogPath, JSON.stringify(entry) + "\n");
+    logAttack(Object.assign({ type: "sql_injection_detected" }, entry));
   }
 
   db.query(sql, (err, rows) => {
@@ -246,46 +404,62 @@ app.use((req, res, next) => {
   next();
 });
 
-app.post('/csp-report', express.text({ type: ['application/csp-report', 'application/json', 'text/plain', '*/*'], limit: '64kb' }), (req, res) => {
-  let payload = req.body;
-  let parsed = null;
-  try {
-    parsed = typeof payload === "string" ? JSON.parse(payload) : payload;
-  } catch { parsed = { raw: payload }; }
+app.post(
+  "/csp-report",
+  express.text({
+    type: ["application/csp-report", "application/json", "text/plain", "*/*"],
+    limit: "64kb",
+  }),
+  (req, res) => {
+    let payload = req.body;
+    let parsed = null;
+    try {
+      parsed = typeof payload === "string" ? JSON.parse(payload) : payload;
+    } catch {
+      parsed = { raw: payload };
+    }
 
-  if (parsed && parsed['csp-report']) parsed = parsed['csp-report'];
+    if (parsed && parsed["csp-report"]) parsed = parsed["csp-report"];
 
-  const entry = { ts: new Date().toISOString(), ip: req.ip, headers: { 'user-agent': req.get('User-Agent') }, report: parsed };
-  fs.appendFileSync(cspLogPath, JSON.stringify(entry) + '\n');
-  res.status(204).end();
-});
+    const entry = {
+      ts: new Date().toISOString(),
+      ip: req.ip,
+      headers: { "user-agent": req.get("User-Agent") },
+      report: parsed,
+    };
+    fs.appendFileSync(cspLogPath, JSON.stringify(entry) + "\n");
+    res.status(204).end();
+  }
+);
 
 // ==========================================================
 // --- Phishing simulation endpoints ---
-const phishLogPath = path.join(__dirname, '..', 'phish.log'); 
-app.get('/phish-landing', (req, res) => {
+const phishLogPath = path.join(__dirname, "..", "phish.log");
+app.get("/phish-landing", (req, res) => {
   const record = {
     ts: new Date().toISOString(),
     ip: req.ip,
-    ua: req.get('User-Agent'),
-    referer: req.get('Referer') || null,
-    q: req.query.q || null,     
+    ua: req.get("User-Agent"),
+    referer: req.get("Referer") || null,
+    q: req.query.q || null,
     url: req.originalUrl,
   };
-  fs.appendFileSync(phishLogPath, JSON.stringify(record) + '\n');
-  res.sendFile(path.join(__dirname, '..', 'public', 'phish-landing.html'));
+  fs.appendFileSync(phishLogPath, JSON.stringify(record) + "\n");
+  res.sendFile(path.join(__dirname, "..", "public", "phish-landing.html"));
 });
 
-app.get('/phish-stats', (req, res) => {
+app.get("/phish-stats", (req, res) => {
   let lines = [];
   try {
-    const raw = fs.readFileSync(phishLogPath, 'utf8').trim();
-    if (raw) lines = raw.split('\n').map(l => JSON.parse(l));
+    const raw = fs.readFileSync(phishLogPath, "utf8").trim();
+    if (raw) lines = raw.split("\n").map((l) => JSON.parse(l));
   } catch {}
   let html = `<h1>Phish Clicks (local demo)</h1><p>Total clicks: ${lines.length}</p>`;
   html += `<table border="1" cellpadding="6" style="border-collapse:collapse"><thead><tr><th>#</th><th>timestamp</th><th>q (test id)</th><th>ip</th><th>user-agent</th><th>referer</th></tr></thead><tbody>`;
   lines.reverse().forEach((r, i) => {
-    html += `<tr><td>${i+1}</td><td>${r.ts}</td><td>${r.q||''}</td><td>${r.ip}</td><td>${r.ua}</td><td>${r.referer||''}</td></tr>`;
+    html += `<tr><td>${i + 1}</td><td>${r.ts}</td><td>${r.q || ""}</td><td>${
+      r.ip
+    }</td><td>${r.ua}</td><td>${r.referer || ""}</td></tr>`;
   });
   html += `</tbody></table><p><small>Note: demo only — do not expose externally.</small></p>`;
   res.send(html);
@@ -293,4 +467,6 @@ app.get('/phish-stats', (req, res) => {
 
 // ==========================================================
 const PORT = 3000;
-app.listen(PORT, () => console.log(`🚀 Server running at http://localhost:${PORT}`));
+app.listen(PORT, () =>
+  console.log(`🚀 Server running at http://localhost:${PORT}`)
+);
