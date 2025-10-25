@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>Mini SIEM Dashboard</title>
+  <style>
+    body {
+      font-family: Consolas, monospace;
+      background: #0e1117;
+      color: #d3d3d3;
+      margin: 0;
+      padding: 1rem 2rem;
+    }
+    h1 { color: #4ade80; }
+    .log {
+      border-left: 4px solid #333;
+      margin: 0.8rem 0;
+      padding: 0.6rem 1rem;
+      background: rgba(255,255,255,0.03);
+      border-radius: 6px;
+    }
+    .critical { border-color: #ef4444; color: #ff8080; }
+    .warning { border-color: #facc15; color: #facc15; }
+    .info { border-color: #38bdf8; color: #9bdfff; }
+    .time { color: #999; font-size: 0.85em; }
+  </style>
+</head>
+<body>
+  <h1>Mini SIEM Dashboard</h1>
+  <p>Monitoring logs from <b>attack.log</b>, <b>honeypot.log</b>, <b>phish.log</b>, and <b>csp-reports.log</b></p>
+  <div id="output"></div>
+
+  <script>
+    async function loadLogs() {
+      const res = await fetch('/api/logs');
+      const data = await res.json();
+      const out = document.getElementById('output');
+      out.innerHTML = '';
+      data.logs.slice(0, 20).forEach(log => {
+        const div = document.createElement('div');
+        div.className = 'log ' + log.severity;
+        div.innerHTML = `
+          <div><span class="time">${log.ts}</span> — <b>${log.severity.toUpperCase()}</b> [${log.source}]</div>
+          <div>Reasons: ${log.reasons.join(', ')}</div>
+          <div style="font-size:0.9em;opacity:0.8;">${JSON.stringify(log.entry)}</div>
+        `;
+        out.appendChild(div);
+      });
+    }
+
+    loadLogs();
+    setInterval(loadLogs, 5000);
+  </script>
+</body>
+</html>
